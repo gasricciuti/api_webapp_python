@@ -49,12 +49,23 @@ def personas():
         # de la URL
         # limit = ...
         # offset = ....
+        
+        limit_str = str(request.args.get('limit'))
+        offset_str = str(request.args.get('offset'))
+
+        limit = 0
+        offset = 0
 
         # Debe verificar si el limit y offset son válidos cuando
         # no son especificados en la URL
+        
+        if (limit_str is not None) and (limit_str.isdigit()):
+            limit = int(limit_str)
+        if (offset_str is not None) and (offset_str.isdigit()):
+            offset = int(offset_str)
 
         # Alumno: Pasarle al metodo report los valores de limit y offset
-        data = persona.report()
+        data = persona.report(limit=limit, offset=offset)
         
         result = '''<h3>Alumno: Implementar la llamada
                     al HTML tabla.html
@@ -62,7 +73,7 @@ def personas():
                     data como parámetro</h3>'''
         # Sacar esta linea cuando haya implementado el return
         # con render template
-        return result
+        return render_template('tabla.html', data=data)
     except:
         return jsonify({'trace': traceback.format_exc()})
 
@@ -87,13 +98,19 @@ def registro():
             # Obtener del HTTP POST JSON el nombre y la edad
             # name = ...
             # age = ...
+            
+            name = str(request.form.get('name'))
+            age = str(request.form.get('age'))
+
+            if (name is None or age is None or age.isdigit() is False):
+                return Response(status=400)
 
             # Alumno: descomentar la linea persona.insert una vez implementado
             # lo anterior:
-            # persona.insert(name, int(age))
+            persona.insert(name, int(age))
             
             # Como respuesta al POST devolvemos la tabla de valores
-            # return redirect(url_for('personas'))
+            return redirect(url_for('personas'))
         except:
             return jsonify({'trace': traceback.format_exc()})
 
